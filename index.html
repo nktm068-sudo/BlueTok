@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>BlueTok | v0.00000000000</title>
+    <style>
+        :root { 
+            --neon-blue: #00d2ff; 
+            --deep-blue: #020b16; 
+            --accent-cyan: #00f2ff; 
+        }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--deep-blue); color: white; 
+            font-family: 'Segoe UI', sans-serif; overflow: hidden; 
+        }
+
+        /* ЭКРАН ВХОДА */
+        #reg-screen { 
+            position: fixed; inset: 0; background: var(--deep-blue); 
+            z-index: 9999; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+        }
+        .reg-card { 
+            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px; 
+            border: 1px solid var(--neon-blue); text-align: center; 
+            backdrop-filter: blur(10px);
+        }
+        input { 
+            background: #000; border: 1px solid var(--neon-blue); color: white; 
+            padding: 12px; border-radius: 8px; margin: 10px 0; outline: none; width: 250px; 
+        }
+        .reg-btn { 
+            background: var(--neon-blue); color: black; border: none; 
+            padding: 12px 30px; border-radius: 8px; cursor: pointer; 
+            font-weight: bold; width: 100%; margin-top: 10px;
+        }
+
+        /* ЛЕНТА */
+        #feed { 
+            width: 100%; height: 100vh; scroll-snap-type: y mandatory; 
+            overflow-y: scroll; scrollbar-width: none; display: none; 
+        }
+        .card { 
+            width: 100%; height: 100vh; scroll-snap-align: start; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; background: radial-gradient(circle at center, #0a1a30 0%, #020b16 100%); 
+        }
+        .content-frame { 
+            width: 85%; height: 75%; border: 1px solid rgba(0, 242, 255, 0.3); 
+            border-radius: 24px; background: rgba(255,255,255,0.03); 
+            backdrop-filter: blur(15px); display: flex; align-items: center; 
+            justify-content: center; font-size: 48px; color: var(--accent-cyan); 
+        }
+
+        /* ПРОФИЛЬ */
+        #profile-screen { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 320px; background: #05101e; border: 2px solid var(--neon-blue); 
+            border-radius: 20px; padding: 30px; display: none; z-index: 5000; 
+            text-align: center; box-shadow: 0 0 50px #000;
+        }
+        .avatar-circle { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--neon-blue); margin: 0 auto 15px; overflow: hidden; background: #000; }
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* КНОПКИ */
+        .controls { position: absolute; right: 30px; bottom: 50px; display: flex; flex-direction: column; gap: 20px; }
+        .btn { width: 55px; height: 55px; border-radius: 50%; border: 1px solid var(--neon-blue); background: rgba(0, 210, 255, 0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; }
+        .btn.active { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
+
+        header { 
+            position: fixed; top: 0; width: 100%; padding: 15px; 
+            z-index: 100; color: var(--neon-blue); 
+            background: rgba(2, 11, 22, 0.9); display: flex; 
+            justify-content: space-around; align-items: center; 
+        }
+    </style>
+</head>
+<body>
+
+<div id="reg-screen">
+    <div class="reg-card">
+        <h2 style="color: var(--neon-blue)">BLUE_ACCESS</h2>
+        <input type="text" id="nick" placeholder="ЛОГИН">
+        <input type="password" id="pass" placeholder="ПАРОЛЬ">
+        <input type="text" id="avatar-url" placeholder="ССЫЛКА НА АВАТАР">
+        <button class="reg-btn" onclick="handleAuth()">ВХОД</button>
+    </div>
+</div>
+
+<div id="profile-screen">
+    <div class="avatar-circle"><img id="p-avatar" src=""></div>
+    <h2 id="p-name" style="color: var(--neon-blue)">ИМЯ</h2>
+    <button class="reg-btn" onclick="alert('BlueStorage в разработке!')">ЗАГРУЗИТЬ ВИДЕО</button>
+    <button class="reg-btn" onclick="closeProfile()">НАЗАД</button>
+    <button class="reg-btn" style="background: #ff4d4d;" onclick="logout()">ВЫЙТИ</button>
+</div>
+
+<header>
+    <div onclick="openProfile()" style="cursor:pointer; display:flex; align-items:center; gap:10px;">
+        <div id="h-avatar" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--neon-blue); overflow:hidden;"><img src="" style="width:100%"></div>
+        <span id="user-display">---</span>
+    </div>
+    <div>v0.00000000000</div>
+</header>
+
+<div id="feed">
+    <div class="card">
+        <div class="content-frame">STREAM_01</div>
+        <div class="controls">
+            <div class="btn" id="l1" onclick="toggleLike('l1', event)">⚡</div>
+            <div class="btn" onclick="openProfile()">👤</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleAuth() {
+        const nick = document.getElementById('nick').value.trim();
+        const pass = document.getElementById('pass').value.trim();
+        const ava = document.getElementById('avatar-url').value || "https://flaticon.com";
+
+        if(!nick || !pass) return alert("Заполни всё!");
+
+        const storedPass = localStorage.getItem('bt_pass_' + nick);
+        if(!storedPass) {
+            localStorage.setItem('bt_pass_' + nick, pass);
+            localStorage.setItem('bt_ava_' + nick, ava);
+            localStorage.setItem('bt_current_user', nick);
+            startApp();
+        } else {
+            if(storedPass === pass) {
+                localStorage.setItem('bt_current_user', nick);
+                startApp();
+            } else {
+                alert("НЕВЕРНЫЙ ПАРОЛЬ!");
+            }
+        }
+    }
+
+    function startApp() {
+        const user = localStorage.getItem('bt_current_user');
+        if(user) {
+            const ava = localStorage.getItem('bt_ava_' + user);
+            document.getElementById('reg-screen').style.display = 'none';
+            document.getElementById('feed').style.display = 'block';
+            document.getElementById('user-display').innerText = user.toUpperCase();
+            document.getElementById('h-avatar').querySelector('img').src = ava;
+            document.getElementById('p-avatar').src = ava;
+            document.getElementById('p-name').innerText = user.toUpperCase();
+        }
+    }
+
+    function openProfile() { document.getElementById('profile-screen').style.display = 'block'; }
+    function closeProfile() { document.getElementById('profile-screen').style.display = 'none'; }
+    function logout() { localStorage.removeItem('bt_current_user'); location.reload(); }
+
+    function toggleLike(id, e) {
+        const btn = document.getElementById(id);
+        btn.classList.toggle('active');
+        if(btn.classList.contains('active')) {
+            for(let i=0; i<6; i++) bolts.push({x: e.clientX, y: e.clientY, life: 1.0});
+        }
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+    canvas.style.position = 'fixed'; canvas.style.inset = '0'; canvas.style.pointerEvents = 'none';
+    function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = res; res();
+
+    let bolts = [];
+    function loop() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        bolts.forEach((b, i) => {
+            b.life -= 0.05;
+            if(b.life > 0) {
+                ctx.strokeStyle = "white"; ctx.shadowBlur = 15; ctx.shadowColor = "#00d2ff";
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                let cx = b.x, cy = b.y;
+                for(let j=0; j<5; j++) { cx += Math.random()*40-20; cy += Math.random()*40-20; ctx.lineTo(cx, cy); }
+                ctx.stroke();
+            } else bolts.splice(i, 1);
+        });
+        requestAnimationFrame(loop);
+    }
+    loop();
+    window.onload = startApp;
+</script>
+
+</body>
+</html>
