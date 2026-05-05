@@ -2,23 +2,49 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>BlueTok | Local Video Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueTok | ULTIMATE 2026</title>
     <style>
         :root { --neon-blue: #00d2ff; --deep-blue: #020b16; --accent-cyan: #00f2ff; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--deep-blue); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-
-        /* ВХОД */
-        #reg-screen { position: fixed; inset: 0; background: var(--deep-blue); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .reg-card { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px; border: 1px solid var(--neon-blue); text-align: center; backdrop-filter: blur(10px); }
-        input { background: #000; border: 1px solid var(--neon-blue); color: white; padding: 12px; border-radius: 8px; margin: 10px 0; outline: none; width: 220px; }
-        .file-label { display: block; background: rgba(0, 210, 255, 0.1); border: 1px dashed var(--neon-blue); color: var(--neon-blue); padding: 10px; border-radius: 8px; cursor: pointer; margin: 10px 0; font-size: 11px; }
-        #avatar-file, #video-upload { display: none; }
-        .reg-btn { background: var(--neon-blue); color: black; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
-
-        /* ЛЕНТА */
-        #feed { width: 100%; height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; display: none; }
-        .card { width: 100%; height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle at center, #0a1a30 0%, #020b16 100%); }
         
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--deep-blue); color: white; 
+            font-family: 'Segoe UI', sans-serif; overflow: hidden; 
+        }
+
+        /* ЭКРАН ВХОДА */
+        #reg-screen { 
+            position: fixed; inset: 0; background: var(--deep-blue); 
+            z-index: 9999; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+        }
+        .reg-card { 
+            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px; 
+            border: 1px solid var(--neon-blue); text-align: center; backdrop-filter: blur(10px); 
+        }
+        .input-group { display: flex; gap: 10px; margin: 10px 0; }
+        input { 
+            background: #000; border: 1px solid var(--neon-blue); color: white; 
+            padding: 12px; border-radius: 8px; outline: none; width: 180px; 
+        }
+        .file-label { 
+            display: block; background: rgba(0, 210, 255, 0.1); border: 1px dashed var(--neon-blue); 
+            color: var(--neon-blue); padding: 10px; border-radius: 8px; cursor: pointer; margin: 10px 0; font-size: 11px; 
+        }
+        #avatar-file, #video-upload { display: none; }
+        .reg-btn { background: var(--neon-blue); color: black; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+
+        /* ЛЕНТА (С КОРРЕКТНЫМ СКРОЛЛОМ) */
+        #feed { 
+            width: 100%; height: 100vh; scroll-snap-type: y mandatory; 
+            overflow-y: scroll; scrollbar-width: none; display: none; 
+        }
+        .card { 
+            width: 100%; height: 100vh; scroll-snap-align: start; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; background: radial-gradient(circle at center, #0a1a30 0%, #020b16 100%); 
+        }
         .content-frame { 
             width: 85%; height: 75%; border: 2px solid var(--neon-blue); 
             border-radius: 24px; background: #000; overflow: hidden;
@@ -27,30 +53,52 @@
         video { width: 100%; height: 100%; object-fit: cover; }
 
         /* ПРОФИЛЬ */
-        #profile-screen { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #05101e; border: 2px solid var(--neon-blue); border-radius: 20px; padding: 30px; display: none; z-index: 5000; text-align: center; box-shadow: 0 0 100px #000; }
-        .avatar-circle { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--neon-blue); margin: 0 auto 15px; overflow: hidden; background: var(--neon-blue); display: flex; align-items: center; justify-content: center; font-size: 40px; color: black; font-weight: bold; }
+        #profile-screen { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 300px; background: #05101e; border: 2px solid var(--neon-blue); 
+            border-radius: 20px; padding: 30px; display: none; z-index: 5000; text-align: center; 
+        }
+        .avatar-circle { 
+            width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--neon-blue); 
+            margin: 0 auto 15px; overflow: hidden; background: var(--neon-blue); 
+            display: flex; align-items: center; justify-content: center; font-size: 40px; color: black; font-weight: bold; 
+        }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        .controls { position: absolute; right: 30px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; }
-        .btn { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--neon-blue); background: rgba(0, 210, 255, 0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 26px; backdrop-filter: blur(5px); }
+        /* УПРАВЛЕНИЕ И СЧЕТЧИК */
+        .controls { position: absolute; right: 30px; bottom: 80px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn { 
+            width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--neon-blue); 
+            background: rgba(0, 210, 255, 0.1); display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; transition: 0.3s; font-size: 26px; 
+        }
         .btn.active { background: var(--neon-blue); color: black; }
+        .like-count { font-size: 14px; font-weight: bold; color: var(--neon-blue); }
 
-        header { position: fixed; top: 0; width: 100%; padding: 15px; z-index: 100; color: var(--neon-blue); background: rgba(2, 11, 22, 0.8); display: flex; justify-content: space-around; align-items: center; border-bottom: 1px solid var(--neon-blue); }
-        
-        nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--neon-blue); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .add-btn { width: 45px; height: 45px; background: var(--neon-blue); border: none; border-radius: 12px; font-size: 30px; cursor: pointer; font-weight: bold; }
+        header { 
+            position: fixed; top: 0; width: 100%; padding: 15px; z-index: 100; 
+            color: var(--neon-blue); background: rgba(2, 11, 22, 0.8); 
+            display: flex; justify-content: space-around; align-items: center; border-bottom: 1px solid var(--neon-blue); 
+        }
+        nav { 
+            position: fixed; bottom: 0; width: 100%; height: 60px; 
+            background: rgba(0,0,0,0.8); border-top: 1px solid var(--neon-blue); 
+            display: none; justify-content: center; align-items: center; z-index: 1000; 
+        }
+        .add-btn { 
+            width: 45px; height: 45px; background: var(--neon-blue); 
+            border: none; border-radius: 12px; font-size: 30px; cursor: pointer; font-weight: bold; 
+        }
     </style>
 </head>
 <body>
 
-<!-- СКРЫТЫЙ ВХОД ДЛЯ ВЫБОРА ВИДЕО -->
 <input type="file" id="video-upload" accept="video/*">
 
 <div id="reg-screen">
     <div class="reg-card">
         <h2 style="color: var(--neon-blue)">BLUE_TOK</h2>
-        <input type="text" id="nick" placeholder="ЛОГИН"><br>
-        <input type="password" id="pass" placeholder="ПАРОЛЬ"><br>
+        <div class="input-group"><input type="text" id="nick" placeholder="ЛОГИН"><input type="password" id="pass" placeholder="ПАРОЛЬ"></div>
         <label class="file-label" for="avatar-file">📁 ВЫБРАТЬ АВАТАР</label>
         <input type="file" id="avatar-file" accept="image/*">
         <button class="reg-btn" onclick="handleAuth()">ВХОД</button>
@@ -70,62 +118,95 @@
         <div id="h-avatar" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--neon-blue); overflow:hidden; background: var(--neon-blue); display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 14px;"><img><span>?</span></div>
         <span id="user-display">---</span>
     </div>
-    <div style="font-size: 10px;">v0.00000000002 [LOCAL_V]</div>
+    <div style="font-size: 10px;">v0.00000000005 [FULL_PRO]</div>
 </header>
 
 <div id="feed">
     <div class="card">
         <div class="content-frame">
-            <video src="https://zencdn.net" autoplay loop muted></video>
+            <video src="https://zencdn.net" autoplay loop muted playsinline></video>
         </div>
-        <div class="controls"><div class="btn" onclick="toggleLike(this, event)">⚡</div><div class="btn" onclick="openProfile()">👤</div></div>
+        <div class="controls"><div class="btn" onclick="toggleLike(this, event)">⚡</div><div class="like-count">0</div></div>
+    </div>
+    <div class="card">
+        <div class="content-frame">
+            <video src="https://w3schools.com" autoplay loop muted playsinline></video>
+        </div>
+        <div class="controls"><div class="btn" onclick="toggleLike(this, event)">⚡</div><div class="like-count">0</div></div>
     </div>
 </div>
 
-<nav id="navbar"><button class="add-btn" onclick="document.getElementById('video-upload').click();">+</button></nav>
+<nav id="navbar"><button class="add-btn" onclick="document.getElementById('video-upload').click()">+</button></nav>
 
 <script>
     let userAva = null;
 
-    // Логика выбора аватара
+    // 1. СЛУШАТЕЛЬ КЛАВИАТУРЫ (ПОЧИНКА СТРЕЛОК)
+    window.addEventListener('keydown', (e) => {
+        const feed = document.getElementById('feed');
+        if (e.key === 'ArrowDown') {
+            feed.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowUp') {
+            feed.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+        }
+    });
+
+    // 2. ВЫБОР АВАТАРА
     document.getElementById('avatar-file').onchange = function(e) {
         const reader = new FileReader();
         reader.onload = (ev) => { 
             userAva = ev.target.result; 
             document.querySelector('.file-label').innerText = "✅ АВАТАР ГОТОВ";
         };
-        reader.readAsDataURL(e.target.files[0]);
+        reader.readAsDataURL(e.target.files);
     };
 
-    // МАГИЯ ЗАГРУЗКИ ВИДЕО ИЗ ПРОВОДНИКА
+    // 3. ЗАГРУЗКА ВИДЕО
     document.getElementById('video-upload').onchange = function(e) {
         const file = e.target.files[0];
         if (!file) return;
-
-        const videoURL = URL.createObjectURL(file); // Создаем временную ссылку на файл
-        const feed = document.getElementById('feed');
+        const url = URL.createObjectURL(file);
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-            <div class="content-frame">
-                <video src="${videoURL}" autoplay loop muted></video>
-            </div>
-            <div class="controls">
-                <div class="btn" onclick="toggleLike(this, event)">⚡</div>
-                <div class="btn" onclick="openProfile()">👤</div>
-            </div>`;
-        feed.prepend(card);
-        alert("ВИДЕО ДОБАВЛЕНО В ЛЕНТУ!");
-    };
+            <div class="content-frame"><video src="${url}" autoplay loop muted playsinline></video></div>
+            <div class="controls"><div class="btn" onclick="toggleLike(this, event)">⚡</div><div class="like-count">0</div></div>
+        `;
+        document.getElementById('feed').prepend(card);
+        alert("ВИДЕО ОПУБЛИКОВАНО!");
+    }
 
+    // 4. ЛАЙКИ И МОЛНИИ
+    function toggleLike(btn, e) {
+        const label = btn.parentElement.querySelector('.like-count');
+        btn.classList.toggle('active');
+        let count = parseInt(label.innerText);
+        if(btn.classList.contains('active')) {
+            label.innerText = count + 1;
+            for(let i=0; i<8; i++) bolts.push({x: e.clientX, y: e.clientY, life: 1.0});
+        } else {
+            label.innerText = count - 1;
+        }
+    }
+
+    // 5. АВТОРИЗАЦИЯ
     function handleAuth() {
         const n = document.getElementById('nick').value.trim();
         const p = document.getElementById('pass').value.trim();
-        if(!n || !p) return alert("Заполни всё!");
-        localStorage.setItem('bt_pass_'+n, p);
-        localStorage.setItem('bt_ava_'+n, userAva || "");
-        localStorage.setItem('bt_current', n);
-        start();
+        if(!n || !p) return alert("Заполни данные!");
+        const stored = localStorage.getItem('bt_pass_'+n);
+        if(!stored) {
+            localStorage.setItem('bt_pass_'+n, p);
+            localStorage.setItem('bt_ava_'+n, userAva || "");
+            localStorage.setItem('bt_current', n);
+            start();
+        } else if(stored === p) {
+            localStorage.setItem('bt_current', n);
+            start();
+        } else {
+            alert("НЕВЕРНЫЙ ПАРОЛЬ!");
+        }
     }
 
     function start() {
@@ -142,8 +223,8 @@
                 document.getElementById('h-avatar').querySelector('img').src = a; document.getElementById('h-avatar').querySelector('img').style.display = 'block';
                 document.getElementById('h-avatar').querySelector('span').style.display = 'none';
             } else {
-                document.getElementById('p-circle').querySelector('span').innerText = u.toUpperCase().charAt(0);
-                document.getElementById('h-avatar').querySelector('span').innerText = u.toUpperCase().charAt(0);
+                document.getElementById('p-circle').querySelector('span').innerText = u.charAt(0).toUpperCase();
+                document.getElementById('h-avatar').querySelector('span').innerText = u.charAt(0).toUpperCase();
             }
             document.getElementById('p-name').innerText = u.toUpperCase();
         }
@@ -152,8 +233,8 @@
     function openProfile() { document.getElementById('profile-screen').style.display = 'block'; }
     function closeProfile() { document.getElementById('profile-screen').style.display = 'none'; }
     function logout() { localStorage.removeItem('bt_current'); location.reload(); }
-    function toggleLike(b, e) { b.classList.toggle('active'); if(b.classList.contains('active')) { for(let i=0; i<8; i++) bolts.push({x: e.clientX, y: e.clientY, life: 1.0}); } }
 
+    // 6. СИСТЕМА МОЛНИЙ (CANVAS)
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     document.body.appendChild(canvas);
@@ -178,5 +259,6 @@
     loop();
     window.onload = start;
 </script>
+
 </body>
 </html>
