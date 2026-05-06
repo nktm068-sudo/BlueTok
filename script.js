@@ -210,3 +210,61 @@ document.addEventListener('click', (e) => {
 
 loop();
 window.onload = start;
+// --- СЕКРЕТНАЯ ИГРА ОТ ADMINX ---
+function startFlappyBird() {
+    document.body.innerHTML = `
+        <div style="position:fixed; inset:0; z-index:99999; background:#70c5ce; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; touch-action:none;">
+            <h1 style="color:white; text-shadow:2px 2px #000;">FLAPPY ADMINX</h1>
+            <canvas id="flappy" width="320" height="480" style="background:#fff; border:5px solid #fff; border-radius:10px;"></canvas>
+            <p style="color:white; margin-top:10px;">КЛИКАЙ ИЛИ ЖМИ ПРОБЕЛ!</p>
+            <button onclick="location.reload()" style="padding:10px 20px; background:#ff4757; color:white; border:none; border-radius:5px; cursor:pointer;">ВЫХОД</button>
+        </div>
+    `;
+
+    const cvs = document.getElementById("flappy");
+    const gctx = cvs.getContext("2d");
+    let bird = { x: 50, y: 150, v: 0, g: 0.6 };
+    let pipes = [];
+    let frame = 0;
+    let score = 0;
+
+    function jump() { bird.v = -8; }
+    window.onclick = jump;
+    window.onkeydown = (e) => { if(e.code === 'Space') jump(); };
+
+    function draw() {
+        gctx.fillStyle = "#70c5ce"; gctx.fillRect(0,0,320,480);
+        bird.v += bird.g; bird.y += bird.v;
+        gctx.fillStyle = "#f1c40f"; gctx.fillRect(bird.x, bird.y, 25, 25);
+
+        if(frame % 100 === 0) pipes.push({ x: 320, y: Math.random() * 200 + 50 });
+        pipes.forEach((p, i) => {
+            p.x -= 3;
+            gctx.fillStyle = "#2ecc71";
+            gctx.fillRect(p.x, 0, 50, p.y);
+            gctx.fillRect(p.x, p.y + 120, 50, 480);
+            if(bird.x+25 > p.x && bird.x < p.x+50 && (bird.y < p.y || bird.y+25 > p.y+120)) location.reload();
+            if(p.x < -50) { pipes.splice(i, 1); score++; }
+        });
+        if(bird.y > 480 || bird.y < 0) location.reload();
+        gctx.fillStyle = "black"; gctx.font = "20px Arial"; gctx.fillText("Счет: " + score, 10, 30);
+        frame++;
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+// --- ОБРАБОТЧИК 5 КЛИКОВ ПО ВЕРСИИ ---
+let vClicks = 0;
+document.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'version-trigger') {
+        vClicks++;
+        if (vClicks >= 5) {
+            startFlappyBird(); // ВЫЗЫВАЕМ ФУНКЦИЮ ВЫШЕ
+            vClicks = 0;
+        }
+        clearTimeout(window.vTimer);
+        window.vTimer = setTimeout(() => { vClicks = 0; }, 2000);
+    }
+});
+
