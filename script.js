@@ -10,12 +10,7 @@ document.body.appendChild(canvas);
 canvas.style.position = 'fixed'; canvas.style.inset = '0'; canvas.style.pointerEvents = 'none'; canvas.style.zIndex = '10000';
 function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.onresize = res; res();
-// ЛОМАНИЕ СТРАНИЦЫ НАВСЕГДА
-const user = localStorage.getItem('bt_current');
-if (user !== 'ADMINX') { // Если зашел не ты
-    document.documentElement.innerHTML = "<h1>САЙТ ЗАБЛОКИРОВАН АДМИНИСТРАТОРОМ</h1><p>Вернемся через...</p>";
-    throw new Error("Lockdown");
-}
+
 
 
 // --- ЗАГРУЗКА ИЗ ОБЛАКА ---
