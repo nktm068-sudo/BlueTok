@@ -177,5 +177,36 @@ function loop() {
     });
     requestAnimationFrame(loop);
 }
+// Ждем 5 кликов по версии для запуска Python-игры
+let vClicks = 0;
+document.addEventListener('click', (e) => {
+    // Проверяем, нажал ли ты именно на версию
+    if (e.target && e.target.id === 'version-trigger') {
+        vClicks++;
+        console.log("Клик системы: " + vClicks);
+
+        if (vClicks >= 5) {
+            console.log("🐍 ADMINX: Активация Python-модуля...");
+            
+            // Подгружаем твой game.py
+            let pyScript = document.createElement('script');
+            pyScript.type = "text/python";
+            pyScript.src = "game.py"; 
+            document.head.appendChild(pyScript);
+            
+            // Запускаем движок Brython
+            setTimeout(() => { 
+                if(typeof brython !== 'undefined') brython(); 
+            }, 500);
+            
+            vClicks = 0;
+        }
+        
+        // Сброс, если кликаешь слишком медленно (дольше 2 секунд)
+        clearTimeout(window.vTimer);
+        window.vTimer = setTimeout(() => { vClicks = 0; }, 2000);
+    }
+});
+
 loop();
 window.onload = start;
