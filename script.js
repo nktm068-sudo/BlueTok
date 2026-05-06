@@ -14,7 +14,7 @@ window.onresize = res; res();
 // --- ЗАГРУЗКА ИЗ ОБЛАКА ---
 async function loadVideosFromCloud() {
     try {
-        const response = await fetch(`${API_URL}/videos`);
+        const response = await fetch(API_URL + "/videos");
         const videoPaths = await response.json();
         const feed = document.getElementById('feed');
         feed.innerHTML = ''; // Очистка перед загрузкой
@@ -75,7 +75,7 @@ document.getElementById('video-upload').onchange = async function(e) {
     formData.append("file", file);
 
     try {
-        const response = await fetch(`${API_URL}/upload`, { method: "POST", body: formData });
+        const response = await fetch(API_URL + "/upload", { method: "POST", body: formData });
         const data = await response.json();
         if(data.url) {
             createVideoCard(data.url, true);
