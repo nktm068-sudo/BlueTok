@@ -1,5 +1,5 @@
 // ССЫЛКА НА ТВОЙ SPACE (убери пробелы!)
-const API_URL = "https://emeraldcreator-bluetokbase.hf.space"; 
+const API_URL = "https://bluetok-server.onrender.com"; 
 
 let bolts = [];
 
